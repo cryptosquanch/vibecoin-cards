@@ -1,26 +1,663 @@
 @import "tailwindcss";
 
+/* ============================================
+   VIBECOIN DESIGN SYSTEM: CSS Variables
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background palette (botanical/sand) */
+  --bg: #F7F4D0;
+  --bg-muted: #FDF8DF;
+  --surface: #FFFDF0;
+  --surface-2: #FAFAF7;
+
+  /* Foreground */
+  --fg: #24231F;
+  --fg-muted: #5F5C4E;
+
+  /* Borders */
+  --border: #E6E5DB;
+  --border-strong: #D2D0C2;
+
+  /* Primary (botanical green) */
+  --primary: #2F7F3E;
+  --primary-hover: #1F6A2F;
+  --primary-active: #155124;
+
+  /* Secondary */
+  --secondary: #D2BB66;
+
+  /* Focus ring */
+  --ring: #4DA65A;
+
+  /* Shadows */
+  --shadow-color: rgba(20, 19, 16, 0.14);
+
+  /* Card palette */
+  --card-primary: #E45239;
+  --card-secondary: #939F8F;
+  --card-paper: #F1F1EC;
+  --card-ink: #2F3129;
+
+  /* Achievement palette */
+  --achievement-primary: #F28C28;
+  --achievement-secondary: #E53935;
+  --achievement-ink: #2B211A;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --bg: #0B2C12;
+  --bg-muted: #0F3516;
+  --surface: #141310;
+  --surface-2: #1B1A17;
+
+  --fg: #FAFAF7;
+  --fg-muted: #D2D0C2;
+
+  --border: rgba(230, 229, 219, 0.16);
+  --border-strong: rgba(230, 229, 219, 0.24);
+
+  --primary: #6BBF7A;
+  --primary-hover: #94D8A0;
+  --primary-active: #BFECC4;
+
+  --secondary: #E3D58F;
+  --ring: #94D8A0;
+  --shadow-color: rgba(0, 0, 0, 0.50);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color: var(--fg);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ============================================
+   BOTANICAL BACKGROUND PATTERN
+   ============================================ */
+
+.botanical-bg {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(247, 244, 208, 0.88), rgba(247, 244, 208, 0.88)),
+    url('/assets/patterns/botanical-lattice.png');
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 840px 840px;
+}
+
+.dark .botanical-bg {
+  background-image:
+    linear-gradient(rgba(11, 44, 18, 0.85), rgba(11, 44, 18, 0.85)),
+    url('/assets/patterns/botanical-lattice.png');
+}
+
+/* Responsive pattern sizing */
+@media (max-width: 640px) {
+  .botanical-bg {
+    background-size: 560px 560px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .botanical-bg {
+    background-size: 720px 720px;
+  }
+}
+
+/* ============================================
+   PLAYING CARD STYLES
+   ============================================ */
+
+.playing-card {
+  aspect-ratio: 5 / 7;
+  background-color: var(--card-paper);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(46, 43, 42, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease-out;
+
+  /* Paper texture feel */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
+    linear-gradient(var(--card-paper), var(--card-paper));
+}
+
+.playing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(46, 43, 42, 0.35);
+}
+
+/* Card corner index */
+.card-index {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  color: var(--card-primary);
+}
+
+.card-index.top-left {
+  top: 6%;
+  left: 8%;
+}
+
+.card-index.bottom-right {
+  bottom: 6%;
+  right: 8%;
+  transform: rotate(180deg);
+}
+
+.card-rank {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.card-suit {
+  font-size: 1rem;
+}
+
+/* Diamond frame outline */
+.card-diamond-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 70%;
+  aspect-ratio: 1;
+  border: 1px solid var(--card-primary);
+  opacity: 0.4;
+}
+
+/* ============================================
+   ACHIEVEMENT BADGE STYLES
+   ============================================ */
+
+.achievement-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--achievement-primary);
+  color: white;
+  font-weight: 600;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   SURFACE / CARD COMPONENTS
+   ============================================ */
+
+.surface-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px var(--shadow-color);
+  padding: 1.25rem;
+}
+
+.surface-panel {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px var(--shadow-color);
+  padding: 1.5rem;
+}
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ring);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-primary:active {
+  background-color: var(--primary-active);
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-2);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--fg);
+}
+
+.btn-ghost:hover {
+  background-color: rgba(77, 166, 90, 0.1);
+}
+
+/* ============================================
+   GLASS MORPHISM
+   ============================================ */
+
+.glass {
+  background-color: rgba(255, 253, 240, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.dark .glass {
+  background-color: rgba(20, 19, 16, 0.92);
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.heading-1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--fg);
+}
+
+.heading-2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.heading-3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg);
+}
+
+.text-muted {
+  color: var(--fg-muted);
+}
+
+/* ============================================
+   3D TRANSFORMS FOR CARD FLIP
+   ============================================ */
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* ============================================
+   HERO SPOTLIGHT & CARD FAN EFFECTS
+   ============================================ */
+
+.hero-spotlight {
+  position: relative;
+}
+
+.hero-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(47, 127, 62, 0.15) 0%,
+    rgba(47, 127, 62, 0.08) 30%,
+    rgba(47, 127, 62, 0.02) 60%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-spotlight::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 30px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(46, 43, 42, 0.2) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card in fan - hover lift with shine */
+.card-fan-item {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease, z-index 0s;
+}
+
+.card-fan-item:hover {
+  z-index: 10 !important;
+}
+
+.card-fan-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.card-fan-item:hover::before {
+  left: 150%;
+}
+
+/* ============================================
+   MARKETPLACE TABLETOP TEXTURE
+   ============================================ */
+
+.tabletop-felt {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(47, 127, 62, 0.03) 0%,
+    rgba(47, 127, 62, 0.06) 50%,
+    rgba(47, 127, 62, 0.03) 100%
+  );
+  border-radius: 24px;
+  padding: 2rem;
+}
+
+.tabletop-felt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='felt'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23felt)' opacity='0.04'/%3E%3C/svg%3E");
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+/* ============================================
+   PRICE CHIP STYLES
+   ============================================ */
+
+.price-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.price-chip-positive {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.price-chip-negative {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ============================================
+   RANK LADDER STRIP
+   ============================================ */
+
+.rank-ladder {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Fraunces', Georgia, serif;
+  overflow-x: auto;
+}
+
+.rank-ladder-item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.rank-ladder-item.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.rank-ladder-item.face-card {
+  color: var(--card-primary);
+  font-weight: 700;
+}
+
+/* ============================================
+   SUIT-COLORED CATEGORY PILLS
+   ============================================ */
+
+.suit-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.suit-pill-red {
+  background-color: rgba(228, 82, 57, 0.1);
+  color: #E45239;
+  border-color: rgba(228, 82, 57, 0.2);
+}
+
+.suit-pill-red:hover,
+.suit-pill-red.active {
+  background-color: rgba(228, 82, 57, 0.2);
+  border-color: rgba(228, 82, 57, 0.4);
+}
+
+.suit-pill-ink {
+  background-color: rgba(47, 49, 41, 0.1);
+  color: #2F3129;
+  border-color: rgba(47, 49, 41, 0.2);
+}
+
+.suit-pill-ink:hover,
+.suit-pill-ink.active {
+  background-color: rgba(47, 49, 41, 0.2);
+  border-color: rgba(47, 49, 41, 0.4);
+}
+
+.suit-pill-all {
+  background-color: var(--surface);
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+.suit-pill-all:hover,
+.suit-pill-all.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ============================================
+   CARD GRID HOVER EFFECTS
+   ============================================ */
+
+.card-grid-item {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-grid-item:hover {
+  transform: translateY(-8px);
+}
+
+.card-grid-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  border-radius: 12px;
+}
+
+.card-grid-item:hover::after {
+  opacity: 1;
+}
+
+/* ============================================
+   PORTFOLIO SNAPSHOT BAND
+   ============================================ */
+
+.portfolio-snapshot {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(47, 127, 62, 0.05) 0%,
+    rgba(210, 187, 102, 0.05) 100%
+  );
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+.portfolio-cards-mini {
+  display: flex;
+  margin-left: 0.5rem;
+}
+
+.portfolio-cards-mini > * {
+  margin-left: -1rem;
+  transition: transform 0.2s ease;
+}
+
+.portfolio-cards-mini > *:first-child {
+  margin-left: 0;
+}
+
+.portfolio-cards-mini:hover > * {
+  margin-left: 0.25rem;
+}
+
+.portfolio-cards-mini:hover > *:first-child {
+  margin-left: 0;
+}
+
+/* ============================================
+   STAGGERED ENTRANCE ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }

@@ -1,0 +1,272 @@
+{
+  // High-level artifact
+  "artifact": {
+    "name": "Botanical Playing Card (Diamond, Ace)",
+    "styleKeywords": [
+      "vintage print",
+      "engraved linework",
+      "paper grain",
+      "limited ink palette",
+      "centered composition"
+    ],
+    "intendedUse": "Reusable card template for a full deck: swap rank/suit indices and swap the central illustration while keeping the same layout + token rules."
+  },
+
+  // Overall scene (what you see in the screenshot, not just the card)
+  "canvas": {
+    "composition": {
+      "layout": "Single card centered on a dark textured surface",
+      "cardPosition": "Centered horizontally; slightly closer to bottom than top",
+      "negativeSpace": "Wide margin around the card so the background texture reads clearly"
+    },
+    "backgroundSurface": {
+      "type": "dark textured material (paper/cloth-like)",
+      "visual": {
+        "texture": "fine grain + subtle mottling",
+        "lighting": "gentle falloff; card reads as brighter focal point"
+      },
+      "colorToken": "grays.surfaceCharcoal"
+    }
+  },
+
+  // The card itself
+  "card": {
+    "shape": {
+      "aspectRatio": "5:7 (approx)",
+      "corners": "very slightly rounded (subtle, nearly square in this image)"
+    },
+    "surface": {
+      "base": "warm off-white paper",
+      "texture": "visible paper fibers; ink sits on top but allows grain to show through",
+      "colorToken": "grays.paper"
+    },
+    "elevation": {
+      "shadow": {
+        "presence": "subtle soft shadow around perimeter, strongest toward bottom-right",
+        "character": "diffuse, low-contrast (realistic tabletop shadow)",
+        "colorToken": "accents.shadow"
+      }
+    },
+    "contentArea": {
+      "safeInset": {
+        "description": "Keep primary content comfortably inside edges; corner indices live within this inset.",
+        "relativeToCard": {
+          "left": "≈6%",
+          "right": "≈6%",
+          "top": "≈4%",
+          "bottom": "≈4%"
+        }
+      }
+    }
+  },
+
+  // Layout structure and layering
+  "layers": [
+    { "name": "Card paper base", "notes": "Warm off-white with paper grain." },
+    {
+      "name": "Center outline diamond",
+      "notes": "Thin outline diamond behind the botanical illustration; centered; rotated 45 degrees."
+    },
+    {
+      "name": "Central botanical illustration",
+      "notes": "Dark ink linework + green fills + red blossoms; sits above the outline diamond."
+    },
+    { "name": "Ribbon bow", "notes": "Red ribbon tied at the base of stems; sits above stems." },
+    {
+      "name": "Corner indices",
+      "notes": "Top-left: upright. Bottom-right: mirrored by 180-degree rotation."
+    }
+  ],
+
+  // Components that can be reused across cards
+  "components": {
+    "cornerIndex": {
+      "description": "Rank glyph with suit icon stacked vertically.",
+      "instances": [
+        {
+          "id": "topLeft",
+          "alignment": "top-left",
+          "insetRelativeToCard": { "x": "≈6%", "y": "≈4%" },
+          "stack": { "direction": "vertical", "gap": "tight (≈1% of card height)" },
+          "rotation": 0
+        },
+        {
+          "id": "bottomRight",
+          "alignment": "bottom-right",
+          "insetRelativeToCard": { "x": "≈6%", "y": "≈4%" },
+          "stack": { "direction": "vertical", "gap": "tight (≈1% of card height)" },
+          "rotation": 180
+        }
+      ],
+      "rankGlyph": {
+        "content": "A (Ace in the screenshot)",
+        "style": "geometric, sharp, no visible serifs; uniform stroke feel",
+        "case": "uppercase",
+        "colorToken": "primary.500"
+      },
+      "suitIcon": {
+        "content": "diamond",
+        "style": "solid fill (no outline)",
+        "colorToken": "primary.500"
+      }
+    },
+
+    "centerOutlineDiamond": {
+      "description": "A thin outlined diamond shape that frames the illustration.",
+      "geometry": {
+        "position": "centered",
+        "rotation": "45 degrees (diamond orientation)",
+        "insetRelativeToCard": {
+          "left": "≈10%",
+          "right": "≈10%",
+          "top": "≈7%",
+          "bottom": "≈7%"
+        }
+      },
+      "stroke": {
+        "weight": "hairline-to-thin (visibly lighter than illustration outlines)",
+        "colorToken": "primary.500",
+        "opacity": "reduced (reads lighter than filled red shapes)"
+      }
+    },
+
+    "centralIllustration": {
+      "description": "Botanical engraving style illustration with limited inks.",
+      "placement": {
+        "anchor": "bottom-center (stems originate near lower third, grow upward)",
+        "boundsRelativeToCard": {
+          "left": "≈14%",
+          "right": "≈14%",
+          "top": "≈11%",
+          "bottom": "≈9%"
+        }
+      },
+      "style": {
+        "linework": "dark ink outlines + interior hatch shading",
+        "fills": "flat muted green for leaves; flat red-orange for blossoms and ribbon",
+        "printFeel": "ink edges slightly textured due to paper grain"
+      },
+      "subElements": {
+        "stemsAndLeaves": {
+          "primaryFillToken": "secondary.500",
+          "outlineToken": "grays.ink",
+          "hatchingToken": "grays.inkMuted"
+        },
+        "flowers": {
+          "primaryFillToken": "primary.500",
+          "shadowFillToken": "primary.700",
+          "outlineToken": "grays.ink"
+        },
+        "accentDots": {
+          "description": "Small red dots (berry-like accents) near leaf tips",
+          "fillToken": "primary.500",
+          "outlineToken": "grays.ink"
+        },
+        "ribbon": {
+          "fillToken": "primary.500",
+          "shadowFillToken": "primary.700",
+          "outlineToken": "grays.ink"
+        }
+      }
+    }
+  },
+
+  // Design tokens (colors + type + strokes + effects)
+  "tokens": {
+    "color": {
+      "primary": {
+        "50": "#FDF1EF",
+        "100": "#FBE5E1",
+        "200": "#F7CBC4",
+        "300": "#F2ACA0",
+        "400": "#EC8674",
+        "500": "#E45239",
+        "600": "#C94832",
+        "700": "#AB3E2B",
+        "800": "#893122",
+        "900": "#67251A"
+      },
+      "secondary": {
+        "50": "#F6F7F6",
+        "100": "#EFF1EE",
+        "200": "#DFE2DD",
+        "300": "#CBD1C9",
+        "400": "#B3BCB1",
+        "500": "#939F8F",
+        "600": "#818C7E",
+        "700": "#6E776B",
+        "800": "#585F56",
+        "900": "#424840"
+      },
+      "grays": {
+        "paper": "#F1F1EC",
+        "paperMuted": "#E5E4DE",
+        "ink": "#2F3129",
+        "inkMuted": "#5D6158",
+        "surfaceCharcoal": "#2E2B2A"
+      },
+      "accents": {
+        "shadow": "rgba-like concept: a soft charcoal shadow derived from grays.surfaceCharcoal",
+        "paperGrainHighlight": "near-white speckling derived from grays.paper",
+        "paperGrainLowlight": "slightly darker fiber flecks derived from grays.paperMuted"
+      }
+    },
+
+    "typography": {
+      "cornerRank": {
+        "feel": "classic playing card rank, geometric and sharp",
+        "weight": "medium",
+        "colorToken": "primary.500",
+        "sizeRelativeToCard": "≈8% of card height",
+        "tracking": "neutral (not wide)"
+      }
+    },
+
+    "strokes": {
+      "outlineDiamond": {
+        "weight": "thin",
+        "colorToken": "primary.500",
+        "opacity": "reduced so it reads lighter than solid red fills"
+      },
+      "illustrationOutline": {
+        "weight": "medium (clearly heavier than hatch lines)",
+        "colorToken": "grays.ink"
+      },
+      "illustrationHatching": {
+        "weight": "hairline",
+        "colorToken": "grays.ink"
+      }
+    },
+
+    "spacing": {
+      "cornerInset": "≈6% of card width from left/right; ≈4% of card height from top/bottom",
+      "cornerRankToSuitGap": "tight, ≈1% of card height",
+      "centerMotifInset": "≈10% of card width (outline diamond)",
+      "illustrationInset": "≈14% of card width (botanical bounds)"
+    },
+
+    "texture": {
+      "cardPaper": {
+        "description": "Warm off-white paper grain that remains visible in empty areas and subtly within inks.",
+        "intensity": "moderate (clearly visible but not noisy)"
+      },
+      "inkInteraction": {
+        "description": "Ink is not perfectly flat; paper grain slightly breaks edges and adds organic variation."
+      },
+      "backgroundSurface": {
+        "description": "Dark charcoal texture with subtle mottling; supports the card as the focal element."
+      }
+    }
+  },
+
+  // Rules for scaling this into a design system for the full deck
+  "systemRules": [
+    "Keep the card paper and ink texture consistent across the entire deck.",
+    "Corner indices must always be mirrored: top-left upright, bottom-right rotated 180 degrees, with matching insets.",
+    "Use only the Primary palette for rank and suit in corners, and for any suit-colored elements in the central art.",
+    "Use Secondary palette for foliage or suit-neutral fills in central illustrations (if applicable).",
+    "Keep illustration outlines and hatch shading in ink neutrals (grays.ink and grays.inkMuted) to preserve engraved style.",
+    "The center outline diamond is always behind the illustration and should stay subtle (reduced opacity) so it frames without competing.",
+    "Central illustration should stay within the same bounding region and keep a bottom-center anchor so the deck feels cohesive."
+  ]
+}

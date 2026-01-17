@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievement Badges Review</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 40px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; color: #E45239; }
+    p.note { text-align: center; margin-bottom: 40px; color: #888; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .badge {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+    }
+    .badge img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid #444;
+    }
+    .badge img:hover {
+      border-color: #E45239;
+      transform: scale(1.02);
+    }
+    .badge h3 {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #E45239;
+    }
+    .badge p {
+      color: #666;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+    .badge.needs-fix {
+      border: 2px solid #ff4444;
+    }
+    .badge.needs-fix h3::after {
+      content: " ⚠️";
+    }
+    .good {
+      border: 2px solid #44ff44;
+    }
+    .good h3::after {
+      content: " ✓";
+    }
+  </style>
+</head>
+<body>
+  <h1>Achievement Badges Review</h1>
+  <p class="note">Green border = Good | Red border = Needs fix</p>
+
+  <div class="grid">
+    <!-- Row 1 -->
+    <div class="badge">
+      <img src="/assets/sprites/be-bleeding-edge.png" alt="Be Bleeding Edge">
+      <h3>Be Bleeding Edge</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/fly-by-night.png" alt="Fly By Night">
+      <h3>Fly By Night</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/thank-you.png" alt="Thank You">
+      <h3>Thank You</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/brand-new.png" alt="Brand New">
+      <h3>Brand New</h3>
+      <p>AI Regenerated</p>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="badge">
+      <img src="/assets/sprites/pay-me.png" alt="Pay Me">
+      <h3>Pay Me</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/magic-comes-with-a-price.png" alt="Magic Comes With A Price">
+      <h3>Magic Comes With A Price</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/act-now.png" alt="Act Now">
+      <h3>Act Now</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/tell-the-truth.png" alt="Tell The Truth">
+      <h3>Tell The Truth</h3>
+      <p>AI Regenerated</p>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="badge">
+      <img src="/assets/sprites/roll-the-dice.png" alt="Roll The Dice">
+      <h3>Roll The Dice</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/no-crystal-balls.png" alt="No Crystal Balls">
+      <h3>No Crystal Balls</h3>
+      <p>AI Regenerated</p>
+    </div>
+    <div class="badge good">
+      <img src="/assets/sprites/no-sacrifice-no-victory.png" alt="No Sacrifice No Victory">
+      <h3>No Sacrifice No Victory</h3>
+      <p>Original (good slice)</p>
+    </div>
+    <div class="badge">
+      <img src="/assets/sprites/snake-oil.png" alt="Snake Oil">
+      <h3>Snake Oil</h3>
+      <p>AI Regenerated</p>
+    </div>
+  </div>
+
+</body>
+</html>

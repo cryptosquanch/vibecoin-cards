@@ -1,0 +1,208 @@
+// Vibecoin Database Schema
+// Using SQLite for local development
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// User model - wallet-based authentication via Privy
+model User {
+  id            String    @id @default(cuid())
+  address       String    @unique  // wallet address
+  username      String?   // display name
+  avatar        String?
+  balance       Float     @default(0)  // in-app balance for trading
+
+  // Trading stats
+  totalTrades     Int     @default(0)
+  totalProfitLoss Float   @default(0)
+
+  // Battle stats
+  battleWins      Int     @default(0)
+  battleLosses    Int     @default(0)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  holdings      Holding[]
+  trades        Trade[]
+  battlesAsChallenger Battle[] @relation("Challenger")
+  battlesAsOpponent   Battle[] @relation("Opponent")
+  battlesWon    Battle[] @relation("Winner")
+  payouts       Payout[]
+  achievements  UserAchievement[]
+
+  @@index([address])
+}
+
+// Token model - represents an app/project on the platform
+model Token {
+  id            String    @id @default(cuid())
+  name          String
+  symbol        String    @unique
+  category      String    // AI, DeFi, Gaming, Creator
+  description   String
+  logo          String?
+
+  // Performance metrics (0-100 composite score)
+  score         Int       @default(0)
+  price         Float     @default(0)
+  priceChange24h Float    @default(0)
+  volume24h     Float     @default(0)
+  holders       Int       @default(0)
+  marketCap     Float     @default(0)
+  totalSupply   Float     @default(1000000)
+
+  // Revenue sharing
+  revenuePool   Float     @default(0)
+
+  // Creator info
+  creatorAddress String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  holdings      Holding[]
+  trades        Trade[]
+  priceHistory  PriceHistory[]
+  payouts       Payout[]
+
+  @@index([symbol])
+  @@index([category])
+  @@index([score])
+}
+
+// Holding model - user's token positions
+model Holding {
+  id            String    @id @default(cuid())
+  userId        String
+  tokenId       String
+  amount        Float
+  averageCost   Float     // average buy price
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token         Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenId])
+  @@index([userId])
+  @@index([tokenId])
+}
+
+// Trade model - buy/sell transaction history
+model Trade {
+  id            String    @id @default(cuid())
+  userId        String
+  tokenId       String
+  type          String    // 'BUY' or 'SELL'
+  amount        Float
+  price         Float
+  total         Float
+  txHash        String?   // blockchain transaction hash
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token         Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenId])
+  @@index([createdAt])
+}
+
+// Battle model - portfolio battles between users
+model Battle {
+  id              String    @id @default(cuid())
+  challengerId    String
+  opponentId      String
+  winnerId        String?
+  status          String    @default("PENDING") // PENDING, COMPLETED, CANCELLED
+
+  // Scores calculated from portfolio ranks
+  challengerScore Int       @default(0)
+  opponentScore   Int       @default(0)
+
+  // Wager
+  wagerAmount     Float     @default(0)
+
+  createdAt       DateTime  @default(now())
+
+  // Relations
+  challenger      User      @relation("Challenger", fields: [challengerId], references: [id], onDelete: Cascade)
+  opponent        User      @relation("Opponent", fields: [opponentId], references: [id], onDelete: Cascade)
+  winner          User?     @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
+
+  @@index([challengerId])
+  @@index([opponentId])
+  @@index([status])
+}
+
+// PriceHistory model - historical price data for charts
+model PriceHistory {
+  id            String    @id @default(cuid())
+  tokenId       String
+  price         Float
+  volume        Float
+  timestamp     DateTime  @default(now())
+
+  // Relations
+  token         Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([tokenId])
+  @@index([timestamp])
+}
+
+// Payout model - revenue share distributions
+model Payout {
+  id            String    @id @default(cuid())
+  userId        String
+  tokenId       String
+  amount        Float
+  sharePercent  Float     @default(0)  // percentage of total distribution
+  source        String    @default("revenue_share")  // source of payout
+  txHash        String?
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token         Token     @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenId])
+}
+
+// Achievement definitions
+model Achievement {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  description   String
+  icon          String
+  rarity        String    // common, rare, epic, legendary
+  requirement   String    // JSON description of unlock conditions
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  userAchievements UserAchievement[]
+}
+
+// User achievements (unlocked)
+model UserAchievement {
+  id            String    @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime  @default(now())
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}

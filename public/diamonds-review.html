@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamonds Cards Review</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 40px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; color: #E45239; }
+    p.note { text-align: center; margin-bottom: 40px; color: #888; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid #444;
+    }
+    .card img:hover {
+      border-color: #E45239;
+      transform: scale(1.02);
+    }
+    .card h3 {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #E45239;
+    }
+    .card p {
+      color: #666;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .card.needs-fix {
+      border: 2px solid #ff4444;
+    }
+    .card.needs-fix h3::after {
+      content: " (NEEDS FIX)";
+      color: #ff4444;
+    }
+  </style>
+</head>
+<body>
+  <h1>DIAMONDS (Lotus) - Number Cards Review</h1>
+  <p class="note">Click to view full size. Cards with red border need regeneration.</p>
+
+  <div class="grid">
+    <div class="card">
+      <img src="/assets/numbers/ace-diamonds.jpg" alt="Ace of Diamonds">
+      <h3>Ace</h3>
+      <p>ace-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/2-diamonds.jpg" alt="2 of Diamonds">
+      <h3>2</h3>
+      <p>2-diamonds.jpg</p>
+    </div>
+    <div class="card needs-fix">
+      <img src="/assets/numbers/3-diamonds.jpg" alt="3 of Diamonds">
+      <h3>3</h3>
+      <p>3-diamonds.jpg - has "R" in corner</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/4-diamonds.jpg" alt="4 of Diamonds">
+      <h3>4</h3>
+      <p>4-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/5-diamonds.jpg" alt="5 of Diamonds">
+      <h3>5</h3>
+      <p>5-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/6-diamonds.jpg" alt="6 of Diamonds">
+      <h3>6</h3>
+      <p>6-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/7-diamonds.jpg" alt="7 of Diamonds">
+      <h3>7</h3>
+      <p>7-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/8-diamonds.jpg" alt="8 of Diamonds">
+      <h3>8</h3>
+      <p>8-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/9-diamonds.jpg" alt="9 of Diamonds">
+      <h3>9</h3>
+      <p>9-diamonds.jpg</p>
+    </div>
+    <div class="card">
+      <img src="/assets/numbers/10-diamonds.jpg" alt="10 of Diamonds">
+      <h3>10</h3>
+      <p>10-diamonds.jpg</p>
+    </div>
+  </div>
+
+</body>
+</html>

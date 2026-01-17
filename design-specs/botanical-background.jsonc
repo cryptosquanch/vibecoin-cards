@@ -1,0 +1,163 @@
+{
+  // Source analysis (what is actually visible in the screenshot)
+  "source": {
+    "type": "backgroundPatternOnly",
+    "imagePath": "/mnt/data/c009ad5b-7cd9-4b06-9d90-650b961f387f.png",
+    "imageSizePx": { "w": 2047, "h": 1547 },
+    "whatIsVisible": {
+      "typography": "NOT_PRESENT_IN_SCREENSHOT",
+      "icons": "NOT_PRESENT_IN_SCREENSHOT",
+      "layoutComponents": "NOT_PRESENT_IN_SCREENSHOT",
+      "primaryAsset": "Repeating botanical lattice pattern (hand-drawn line art, green ink on warm cream paper)"
+    },
+    "patternCharacteristics": {
+      "style": [
+        "block-print / vintage wallpaper vibe",
+        "hand-inked look with imperfect strokes",
+        "outlined leaves with interior hatching lines",
+        "small dotted fruit/berries (lemon-like) as repeating accents"
+      ],
+      "geometry": {
+        "structure": "diamond lattice (diagonal grid) formed by vine branches",
+        "dominantAngle": 45,
+        "estimatedRepeatPx": {
+          "primary": { "x": 840, "y": 840 },
+          "secondarySubRepeats": [205, 420, 637]
+        }
+      }
+    }
+  },
+
+  // Color system
+  "color": {
+    "palettes": {
+      "primary": {
+        "name": "Botanical Green",
+        "50": "#F0FBF1",
+        "100": "#DFF6E2",
+        "200": "#BFECC4",
+        "300": "#94D8A0",
+        "400": "#6BBF7A",
+        "500": "#4DA65A",
+        "600": "#3C914C",
+        "700": "#2F7F3E",
+        "800": "#1F6A2F",
+        "900": "#155124",
+        "950": "#0B2C12"
+      },
+      "secondary": {
+        "name": "Sand Cream",
+        "50": "#FFFDF0",
+        "100": "#FDF8DF",
+        "200": "#F7F4D0",
+        "300": "#EFE7B8",
+        "400": "#E3D58F",
+        "500": "#D2BB66",
+        "600": "#B4974B",
+        "700": "#8E713A",
+        "800": "#6E5730",
+        "900": "#574628",
+        "950": "#2F2517"
+      }
+    },
+    "neutrals": {
+      "grayWarm": {
+        "50": "#FAFAF7",
+        "100": "#F2F2EC",
+        "200": "#E6E5DB",
+        "300": "#D2D0C2",
+        "400": "#B7B4A2",
+        "500": "#9A9783",
+        "600": "#7C7967",
+        "700": "#5F5C4E",
+        "800": "#3E3C34",
+        "900": "#24231F",
+        "950": "#141310"
+      }
+    },
+    "semanticTokens": {
+      "light": {
+        "bg": "#F7F4D0",
+        "bgMuted": "#FDF8DF",
+        "surface": "#FFFDF0",
+        "surface2": "#FAFAF7",
+        "fg": "#24231F",
+        "fgMuted": "#5F5C4E",
+        "border": "#E6E5DB",
+        "borderStrong": "#D2D0C2",
+        "primary": "#2F7F3E",
+        "primaryHover": "#1F6A2F",
+        "primaryActive": "#155124",
+        "secondary": "#D2BB66",
+        "ring": "#4DA65A",
+        "shadowColor": "rgba(20, 19, 16, 0.14)"
+      },
+      "dark": {
+        "bg": "#0B2C12",
+        "bgMuted": "#0F3516",
+        "surface": "#141310",
+        "surface2": "#1B1A17",
+        "fg": "#FAFAF7",
+        "fgMuted": "#D2D0C2",
+        "border": "rgba(230, 229, 219, 0.16)",
+        "borderStrong": "rgba(230, 229, 219, 0.24)",
+        "primary": "#6BBF7A",
+        "primaryHover": "#94D8A0",
+        "primaryActive": "#BFECC4",
+        "secondary": "#E3D58F",
+        "ring": "#94D8A0",
+        "shadowColor": "rgba(0, 0, 0, 0.50)"
+      }
+    }
+  },
+
+  // Typography
+  "typography": {
+    "fontFamilies": {
+      "sans": ["Inter", "ui-sans-serif", "system-ui"],
+      "display": ["Fraunces", "ui-serif", "Georgia"]
+    }
+  },
+
+  // Background pattern usage
+  "backgrounds": {
+    "botanicalPattern": {
+      "cssGuidelines": {
+        "base": {
+          "backgroundRepeat": "repeat",
+          "backgroundPosition": "center",
+          "backgroundSize": "840px 840px"
+        },
+        "responsiveAdjustments": {
+          "smAndDown": { "backgroundSize": "560px 560px" },
+          "mdToLg": { "backgroundSize": "720px 720px" },
+          "xlUp": { "backgroundSize": "840px 840px" }
+        },
+        "overlaysForLegibility": {
+          "light": "linear-gradient(rgba(247,244,208,0.88), rgba(247,244,208,0.88))",
+          "dark": "linear-gradient(rgba(11,44,18,0.78), rgba(11,44,18,0.78))"
+        }
+      }
+    }
+  },
+
+  // Layout
+  "layout": {
+    "containers": {
+      "pageMaxWidth": "1280px",
+      "contentMaxWidth": "1024px",
+      "narrowMaxWidth": "768px"
+    },
+    "radiiPx": {
+      "sm": 8,
+      "md": 12,
+      "lg": 16,
+      "xl": 20
+    },
+    "shadows": {
+      "sm": "0 1px 2px rgba(20, 19, 16, 0.10)",
+      "md": "0 8px 20px rgba(20, 19, 16, 0.14)",
+      "lg": "0 18px 50px rgba(20, 19, 16, 0.18)"
+    }
+  }
+}
