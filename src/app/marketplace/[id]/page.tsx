@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, use } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout';
-import { PlayingCard, getSuitForCategory, getRankFromScore } from '@/components/design-system';
+import { AppCard, getSuitForCategory, getRankFromScore } from '@/components/design-system';
+import type { Suit, Rank } from '@/components/design-system';
 import { TradeModal, GraduationProgress, FeeSummary } from '@/components/trading';
 import { PriceChart } from '@/components/charts';
 import { WatchlistButton } from '@/components/watchlist';
@@ -111,14 +112,17 @@ export default function TokenDetailPage({
         <div className="grid md:grid-cols-2 gap-8">
           {/* Card Display */}
           <div className="surface-panel flex flex-col items-center justify-center py-8">
-            <PlayingCard
-              rank={rank as any}
-              suit={suit}
+            <AppCard
+              name={token.name}
+              symbol={token.symbol}
+              imageUrl={token.logo}
+              rank={rank as Rank}
+              suit={suit as Suit}
+              price={token.price}
+              priceChange={token.priceChange24h}
               size="xl"
-              flippable
-              backVariant="botanical"
+              showPrice={false}
             />
-            <p className="text-muted text-sm mt-4">Click card to flip</p>
           </div>
 
           {/* Token Details */}

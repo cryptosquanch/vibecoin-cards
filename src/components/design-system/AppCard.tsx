@@ -14,7 +14,7 @@ interface AppCardProps {
   suit: Suit;
   price: number;
   priceChange: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   showPrice?: boolean;
   className?: string;
 }
@@ -42,6 +42,8 @@ const sizeConfig = {
     name: 'text-sm',
     symbol: 'text-xs',
     price: 'text-xs',
+    categoryIcon: 'w-6 h-6 text-sm',
+    placeholderText: 'text-4xl',
   },
   md: {
     container: 'w-40',
@@ -50,6 +52,8 @@ const sizeConfig = {
     name: 'text-base',
     symbol: 'text-sm',
     price: 'text-sm',
+    categoryIcon: 'w-6 h-6 text-sm',
+    placeholderText: 'text-4xl',
   },
   lg: {
     container: 'w-48',
@@ -58,6 +62,18 @@ const sizeConfig = {
     name: 'text-lg',
     symbol: 'text-sm',
     price: 'text-base',
+    categoryIcon: 'w-6 h-6 text-sm',
+    placeholderText: 'text-5xl',
+  },
+  xl: {
+    container: 'w-72',
+    image: 'h-56',
+    badge: 'text-xl px-3 py-1.5',
+    name: 'text-xl',
+    symbol: 'text-base',
+    price: 'text-lg',
+    categoryIcon: 'w-10 h-10 text-xl',
+    placeholderText: 'text-7xl',
   },
 };
 
@@ -113,7 +129,7 @@ export function AppCard({
           ) : (
             // Placeholder with gradient and first letter
             <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-              <span className="text-4xl font-bold text-white/90 drop-shadow-lg">
+              <span className={`${config.placeholderText} font-bold text-white/90 drop-shadow-lg`}>
                 {name.charAt(0)}
               </span>
             </div>
@@ -130,8 +146,8 @@ export function AppCard({
           </div>
 
           {/* Category Indicator - Bottom Left */}
-          <div className={`absolute bottom-2 left-2 w-6 h-6 rounded-full ${suitInfo.bg} flex items-center justify-center shadow-md`}>
-            <span className="text-white text-sm">{suitInfo.symbol}</span>
+          <div className={`absolute bottom-2 left-2 ${config.categoryIcon} rounded-full ${suitInfo.bg} flex items-center justify-center shadow-md`}>
+            <span className="text-white">{suitInfo.symbol}</span>
           </div>
         </div>
 
