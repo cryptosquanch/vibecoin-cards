@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout';
-import { PlayingCard, getSuitForCategory, getRankFromScore } from '@/components/design-system';
+import { AppCard, getSuitForCategory, getRankFromScore } from '@/components/design-system';
 import { TradeModal } from '@/components/trading';
 import { WalletPanel } from '@/components/wallet';
-import type { Suit } from '@/components/design-system';
+import type { Suit, Rank } from '@/components/design-system';
 import type { Token } from '@/lib/mock-data';
 
 type Category = 'all' | 'AI' | 'DeFi' | 'Gaming' | 'Creator';
@@ -221,47 +221,32 @@ export default function MarketplacePage() {
                   className={`card-grid-item group relative animate-fade-in-up animation-delay-${Math.min((index % 8) + 1, 5) * 100}`}
                 >
                   <Link href={`/marketplace/${token.id}`}>
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="relative">
-                        <PlayingCard
-                          rank={getRankFromScore(token.score) as any}
-                          suit={getSuitForCategory(token.category)}
-                          size="lg"
-                          flippable={false}
-                          backVariant="botanical"
-                        />
+                    <div className="relative">
+                      <AppCard
+                        name={token.name}
+                        symbol={token.symbol}
+                        imageUrl={token.logo}
+                        rank={getRankFromScore(token.score) as Rank}
+                        suit={getSuitForCategory(token.category)}
+                        price={token.price}
+                        priceChange={token.priceChange24h}
+                        size="lg"
+                      />
 
-                        {/* Quick Trade Buttons - appear on hover */}
-                        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 rounded-lg">
-                          <button
-                            onClick={(e) => openTradeModal(token, 'buy', e)}
-                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg shadow-lg"
-                          >
-                            Invest
-                          </button>
-                          <button
-                            onClick={(e) => openTradeModal(token, 'sell', e)}
-                            className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-lg"
-                          >
-                            Sell
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Token Info with Price Chip */}
-                      <div className="text-center w-full">
-                        <p className="font-semibold group-hover:text-botanical-600 transition-colors">
-                          {token.name}
-                        </p>
-                        <p className="text-muted text-sm mb-2">{token.symbol}</p>
-
-                        {/* Price Chip */}
-                        <div className={`price-chip inline-flex ${token.priceChange24h >= 0 ? 'price-chip-positive' : 'price-chip-negative'}`}>
-                          <span className="font-semibold">${token.price.toFixed(2)}</span>
-                          <span className={token.priceChange24h >= 0 ? 'text-green-600' : 'text-red-500'}>
-                            {token.priceChange24h >= 0 ? '+' : ''}{token.priceChange24h.toFixed(1)}%
-                          </span>
-                        </div>
+                      {/* Quick Trade Buttons - appear on hover */}
+                      <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-xl">
+                        <button
+                          onClick={(e) => openTradeModal(token, 'buy', e)}
+                          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg shadow-lg transform hover:scale-105 transition-transform"
+                        >
+                          Invest
+                        </button>
+                        <button
+                          onClick={(e) => openTradeModal(token, 'sell', e)}
+                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-lg transform hover:scale-105 transition-transform"
+                        >
+                          Sell
+                        </button>
                       </div>
                     </div>
                   </Link>

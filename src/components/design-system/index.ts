@@ -11,5 +11,11 @@ export {
 } from './PlayingCard';
 export type { Suit, Rank, CardBackVariant } from './PlayingCard';
 
+export { AppCard } from './AppCard';
+export {
+  getSuitForCategory as getAppSuit,
+  getRankFromScore as getAppRank,
+} from './AppCard';
+
 export { AchievementBadge, AchievementGrid, ACHIEVEMENTS } from './AchievementBadge';
 export type { AchievementId } from './AchievementBadge';
