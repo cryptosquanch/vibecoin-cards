@@ -1,5 +1,46 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { MOCK_TOKENS } from '@/lib/mock-data';
+
+// Helper to get mock tokens with filtering and sorting
+function getMockTokens(category: string | null, sortBy: string, order: string, limit: number, offset: number) {
+  let tokens = [...MOCK_TOKENS];
+
+  // Filter by category
+  if (category && ['AI', 'DeFi', 'Gaming', 'Creator'].includes(category)) {
+    tokens = tokens.filter((t) => t.category === category);
+  }
+
+  // Sort
+  const sortFieldMap: Record<string, keyof typeof MOCK_TOKENS[0]> = {
+    price: 'price',
+    volume: 'volume24h',
+    holders: 'holders',
+    marketCap: 'marketCap',
+    priceChange: 'priceChange24h',
+    score: 'score',
+  };
+  const sortField = sortFieldMap[sortBy] || 'score';
+  tokens.sort((a, b) => {
+    const aVal = a[sortField] as number;
+    const bVal = b[sortField] as number;
+    return order === 'asc' ? aVal - bVal : bVal - aVal;
+  });
+
+  // Paginate
+  const total = tokens.length;
+  const paginatedTokens = tokens.slice(offset, offset + limit);
+
+  return {
+    tokens: paginatedTokens,
+    pagination: {
+      total,
+      limit,
+      offset,
+      hasMore: offset + paginatedTokens.length < total,
+    },
+  };
+}
 
 // GET /api/tokens - List all tokens with optional filtering
 export async function GET(request: Request) {
@@ -69,11 +110,9 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Failed to fetch tokens:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch tokens' },
-      { status: 500 }
-    );
+    console.error('Database unavailable, using mock data:', error);
+    // Fallback to mock data when database is unavailable
+    return NextResponse.json(getMockTokens(category, sortBy, order, limit, offset));
   }
 }
 

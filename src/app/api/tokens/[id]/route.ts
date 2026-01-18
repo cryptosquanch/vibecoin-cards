@@ -1,5 +1,17 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { MOCK_TOKENS } from '@/lib/mock-data';
+
+// Helper to find mock token by ID or symbol
+function findMockToken(id: string) {
+  // Try by ID first
+  let token = MOCK_TOKENS.find((t) => t.id === id);
+  // Then by symbol
+  if (!token) {
+    token = MOCK_TOKENS.find((t) => t.symbol.toUpperCase() === id.toUpperCase());
+  }
+  return token;
+}
 
 // GET /api/tokens/[id] - Get single token by ID or symbol
 export async function GET(
@@ -54,11 +66,16 @@ export async function GET(
 
     return NextResponse.json({ token });
   } catch (error) {
-    console.error('Failed to fetch token:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch token' },
-      { status: 500 }
-    );
+    console.error('Database unavailable, using mock data:', error);
+    // Fallback to mock data when database is unavailable
+    const mockToken = findMockToken(id);
+    if (!mockToken) {
+      return NextResponse.json(
+        { error: 'Token not found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ token: mockToken });
   }
 }
 
