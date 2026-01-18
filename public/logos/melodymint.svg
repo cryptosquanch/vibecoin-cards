@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <rect width="256" height="256" rx="32" fill="#F472B6"/>
+  <g fill="white">
+    <!-- Music note -->
+    <ellipse cx="100" cy="145" rx="22" ry="18" opacity="0.95"/>
+    <rect x="118" y="85" width="8" height="65" rx="2" opacity="0.9"/>
+    <path d="M126 85 Q140 80 155 90 Q170 100 160 115 L126 105 Z" opacity="0.85"/>
+    <!-- Second note -->
+    <ellipse cx="155" cy="155" rx="18" ry="14" opacity="0.85"/>
+    <rect x="169" y="100" width="6" height="58" rx="2" opacity="0.8"/>
+    <!-- Connection beam -->
+    <rect x="122" y="85" width="55" height="8" rx="2" transform="rotate(10 122 85)" opacity="0.75"/>
+  </g>
+  <text x="128" y="218" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="22" font-weight="bold">MelodyMint</text>
+</svg>

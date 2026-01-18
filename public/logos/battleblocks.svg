@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <rect width="256" height="256" rx="32" fill="#EF4444"/>
+  <g fill="white">
+    <!-- Crossed swords with blocks -->
+    <rect x="70" y="90" width="40" height="40" rx="6" opacity="0.9"/>
+    <rect x="146" y="90" width="40" height="40" rx="6" opacity="0.9"/>
+    <rect x="108" y="130" width="40" height="40" rx="6" opacity="0.95"/>
+    <!-- Sword 1 -->
+    <rect x="60" y="125" width="60" height="8" rx="2" transform="rotate(-45 90 129)" opacity="0.8"/>
+    <!-- Sword 2 -->
+    <rect x="136" y="125" width="60" height="8" rx="2" transform="rotate(45 166 129)" opacity="0.8"/>
+  </g>
+  <text x="128" y="218" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="22" font-weight="bold">BattleBlocks</text>
+</svg>

@@ -10,15 +10,14 @@ const adapter = new PrismaLibSql({
 // Create Prisma client with adapter
 const prisma = new PrismaClient({ adapter });
 
-// Initial token data (from mock-data.ts)
-// Logo URLs use ui-avatars.com for nice placeholder images
+// Initial token data with custom SVG logos
 const INITIAL_TOKENS = [
   {
     name: 'NeuroAI',
     symbol: 'NEUR',
     category: 'AI',
     description: 'Decentralized AI inference network powered by 0G storage',
-    logo: 'https://ui-avatars.com/api/?name=Neuro+AI&background=8B5CF6&color=fff&size=256&bold=true',
+    logo: '/logos/neuroai.svg',
     score: 92,
     price: 2.45,
     priceChange24h: 12.5,
@@ -32,7 +31,7 @@ const INITIAL_TOKENS = [
     symbol: 'SWAP',
     category: 'DeFi',
     description: 'Lightning-fast DEX built on 0G with sub-second finality',
-    logo: 'https://ui-avatars.com/api/?name=Swap+Fi&background=3B82F6&color=fff&size=256&bold=true',
+    logo: '/logos/swapfi.svg',
     score: 78,
     price: 0.85,
     priceChange24h: -3.2,
@@ -46,7 +45,7 @@ const INITIAL_TOKENS = [
     symbol: 'PXLQ',
     category: 'Gaming',
     description: 'Play-to-earn RPG with on-chain game state stored on 0G',
-    logo: 'https://ui-avatars.com/api/?name=Pixel+Quest&background=10B981&color=fff&size=256&bold=true',
+    logo: '/logos/pixelquest.svg',
     score: 65,
     price: 0.12,
     priceChange24h: 8.7,
@@ -60,7 +59,7 @@ const INITIAL_TOKENS = [
     symbol: 'ARTV',
     category: 'Creator',
     description: 'NFT marketplace for AI-generated art stored on 0G',
-    logo: 'https://ui-avatars.com/api/?name=Art+Verse&background=EC4899&color=fff&size=256&bold=true',
+    logo: '/logos/artverse.svg',
     score: 45,
     price: 0.03,
     priceChange24h: -1.5,
@@ -74,7 +73,7 @@ const INITIAL_TOKENS = [
     symbol: 'DFKG',
     category: 'DeFi',
     description: 'Yield aggregator optimizing across 0G DeFi protocols',
-    logo: 'https://ui-avatars.com/api/?name=DeFi+King&background=F59E0B&color=fff&size=256&bold=true',
+    logo: '/logos/defiking.svg',
     score: 88,
     price: 5.20,
     priceChange24h: 4.3,
@@ -88,7 +87,7 @@ const INITIAL_TOKENS = [
     symbol: 'COGN',
     category: 'AI',
     description: 'On-chain machine learning models with verifiable compute',
-    logo: 'https://ui-avatars.com/api/?name=Cogni+Chain&background=6366F1&color=fff&size=256&bold=true',
+    logo: '/logos/cognichain.svg',
     score: 71,
     price: 0.95,
     priceChange24h: 15.2,
@@ -102,7 +101,7 @@ const INITIAL_TOKENS = [
     symbol: 'BBLK',
     category: 'Gaming',
     description: 'Fully on-chain strategy game with 0G-powered replays',
-    logo: 'https://ui-avatars.com/api/?name=Battle+Blocks&background=EF4444&color=fff&size=256&bold=true',
+    logo: '/logos/battleblocks.svg',
     score: 82,
     price: 0.45,
     priceChange24h: 22.1,
@@ -116,7 +115,7 @@ const INITIAL_TOKENS = [
     symbol: 'MELO',
     category: 'Creator',
     description: 'Music NFTs with royalty streaming on 0G',
-    logo: 'https://ui-avatars.com/api/?name=Melody+Mint&background=F472B6&color=fff&size=256&bold=true',
+    logo: '/logos/melodymint.svg',
     score: 55,
     price: 0.08,
     priceChange24h: 6.8,

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <rect width="256" height="256" rx="32" fill="#EC4899"/>
+  <g fill="white">
+    <!-- Paint palette -->
+    <ellipse cx="128" cy="125" rx="55" ry="45" opacity="0.95"/>
+    <ellipse cx="128" cy="125" rx="12" ry="10" fill="#EC4899"/>
+    <!-- Paint dots -->
+    <circle cx="95" cy="110" r="10" fill="#8B5CF6"/>
+    <circle cx="115" cy="95" r="8" fill="#3B82F6"/>
+    <circle cx="145" cy="95" r="9" fill="#10B981"/>
+    <circle cx="165" cy="110" r="8" fill="#F59E0B"/>
+    <circle cx="160" cy="135" r="9" fill="#EF4444"/>
+    <circle cx="100" cy="140" r="8" fill="#6366F1"/>
+    <!-- Brush -->
+    <rect x="150" y="145" width="45" height="10" rx="3" transform="rotate(45 150 145)" opacity="0.9"/>
+    <path d="M180 175 L195 160 Q200 165 195 175 L185 185 Q175 190 180 175 Z" opacity="0.85"/>
+  </g>
+  <text x="128" y="218" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="28" font-weight="bold">ArtVerse</text>
+</svg>

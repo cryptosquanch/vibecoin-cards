@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <rect width="256" height="256" rx="32" fill="#3B82F6"/>
+  <g fill="white">
+    <!-- Swap arrows -->
+    <path d="M80 110 L160 110 L145 90" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
+    <path d="M176 150 L96 150 L111 170" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
+    <!-- Circles representing tokens -->
+    <circle cx="70" cy="110" r="16" opacity="0.8"/>
+    <circle cx="186" cy="150" r="16" opacity="0.8"/>
+  </g>
+  <text x="128" y="218" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="32" font-weight="bold">SwapFi</text>
+</svg>
