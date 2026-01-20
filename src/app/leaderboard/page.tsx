@@ -1,12 +1,39 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout';
 import { PlayingCard, getSuitForCategory, getRankFromScore } from '@/components/design-system';
-import { MOCK_TOKENS, MOCK_TOP_TRADERS, type Token, type Trader } from '@/lib/mock-data';
+import { LeaderboardDisplay, LeaderboardTabs } from '@/components/social';
+import type { Rank, Suit } from '@/components/design-system';
+import type { LeaderboardType } from '@/lib/leaderboards';
 
-type Tab = 'apps' | 'trending' | 'investors';
+type Tab = 'apps' | 'trending' | 'investors' | 'gamification';
+
+interface Token {
+  id: string;
+  name: string;
+  symbol: string;
+  category: string;
+  price: number;
+  priceChange24h: number;
+  score: number;
+  logo: string;
+  marketCap: number;
+  volume24h: number;
+  holders: number;
+}
+
+interface Trader {
+  rank: number;
+  address: string;
+  username: string | null;
+  totalProfitLoss: number;
+  totalTrades: number;
+  battleWins: number;
+  holdingsCount: number;
+  portfolioValue: number;
+}
 
 function shortenAddress(address: string): string {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -27,16 +54,40 @@ function getRankBadge(rank: number): { bg: string; text: string; label: string }
 
 export default function LeaderboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('apps');
+  const [tokens, setTokens] = useState<Token[]>([]);
+  const [traders, setTraders] = useState<Trader[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sort tokens by score for top ranked
-  const topRankedTokens = useMemo(() => {
-    return [...MOCK_TOKENS].sort((a, b) => b.score - a.score);
-  }, []);
+  // Fetch leaderboard data
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      try {
+        // Fetch tokens sorted by the appropriate metric
+        const sortBy = activeTab === 'trending' ? 'priceChange' : 'score';
+        const tokensRes = await fetch(`/api/tokens?sortBy=${sortBy}&order=desc&limit=20`);
+        const tokensData = await tokensRes.json();
+        setTokens(tokensData.tokens || []);
 
-  // Sort tokens by 24h price change for trending
-  const trendingTokens = useMemo(() => {
-    return [...MOCK_TOKENS].sort((a, b) => b.priceChange24h - a.priceChange24h);
-  }, []);
+        // Fetch top traders
+        if (activeTab === 'investors') {
+          const tradersRes = await fetch('/api/leaderboard?type=traders&limit=20');
+          const tradersData = await tradersRes.json();
+          setTraders(tradersData.traders || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch leaderboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [activeTab]);
+
+  // Sort tokens
+  const topRankedTokens = [...tokens].sort((a, b) => b.score - a.score);
+  const trendingTokens = [...tokens].sort((a, b) => b.priceChange24h - a.priceChange24h);
 
   return (
     <div className="botanical-bg min-h-screen">
@@ -51,12 +102,13 @@ export default function LeaderboardPage() {
           </p>
         </div>
 
-        {/* Tabs - scrollable on mobile */}
+        {/* Tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-6 px-6">
           {([
             { id: 'apps' as Tab, label: 'Top Performing', icon: '👑' },
             { id: 'trending' as Tab, label: 'Trending', icon: '🔥' },
             { id: 'investors' as Tab, label: 'Top Investors', icon: '🏆' },
+            { id: 'gamification' as Tab, label: 'Gamification', icon: '🎮' },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -69,180 +121,254 @@ export default function LeaderboardPage() {
           ))}
         </div>
 
-        {/* Top Performing Apps */}
-        {activeTab === 'apps' && (
-          <div className="space-y-6">
-            {/* Top 3 Featured */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {topRankedTokens.slice(0, 3).map((token, index) => (
-                <TokenPodium key={token.id} token={token} rank={index + 1} />
-              ))}
-            </div>
-
-            {/* Rest of Rankings */}
-            <div className="surface-panel">
-              <h3 className="heading-3 mb-4">Full Rankings</h3>
-              <div className="divide-y divide-botanical-200">
-                {topRankedTokens.map((token, index) => (
-                  <TokenRow key={token.id} token={token} rank={index + 1} />
-                ))}
-              </div>
-            </div>
+        {loading ? (
+          <div className="surface-panel text-center py-12">
+            <div className="animate-spin w-8 h-8 border-4 border-botanical-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-muted">Loading leaderboard...</p>
           </div>
-        )}
+        ) : (
+          <>
+            {/* Top Performing Apps */}
+            {activeTab === 'apps' && (
+              <div className="space-y-6">
+                {/* Top 3 Featured */}
+                {topRankedTokens.length >= 3 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {topRankedTokens.slice(0, 3).map((token, index) => (
+                      <TokenPodium key={token.id} token={token} rank={index + 1} />
+                    ))}
+                  </div>
+                )}
 
-        {/* Trending Tokens */}
-        {activeTab === 'trending' && (
-          <div className="space-y-6">
-            {/* Biggest Gainers */}
-            <div className="surface-panel">
-              <h3 className="heading-3 mb-4">
-                <span className="text-green-500 mr-2">📈</span>
-                Biggest Gainers (24h)
-              </h3>
-              <div className="divide-y divide-botanical-200">
-                {trendingTokens
-                  .filter(t => t.priceChange24h > 0)
-                  .map((token, index) => (
-                    <TokenRow key={token.id} token={token} rank={index + 1} showChange />
-                  ))}
-              </div>
-            </div>
-
-            {/* Biggest Losers */}
-            <div className="surface-panel">
-              <h3 className="heading-3 mb-4">
-                <span className="text-red-500 mr-2">📉</span>
-                Biggest Losers (24h)
-              </h3>
-              <div className="divide-y divide-botanical-200">
-                {[...trendingTokens]
-                  .reverse()
-                  .filter(t => t.priceChange24h < 0)
-                  .map((token, index) => (
-                    <TokenRow key={token.id} token={token} rank={index + 1} showChange />
-                  ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Top Investors */}
-        {activeTab === 'investors' && (
-          <div className="space-y-6">
-            {/* Top 3 Featured */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {MOCK_TOP_TRADERS.slice(0, 3).map((trader) => (
-                <TraderPodium key={trader.address} trader={trader} />
-              ))}
-            </div>
-
-            {/* Full Rankings - Table on desktop, Cards on mobile */}
-            <div className="surface-panel">
-              <h3 className="heading-3 mb-4">All Investors</h3>
-
-              {/* Desktop Table */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-muted border-b border-botanical-200">
-                      <th className="pb-3 pr-4">Rank</th>
-                      <th className="pb-3 pr-4">Investor</th>
-                      <th className="pb-3 pr-4 text-right">Returns</th>
-                      <th className="pb-3 pr-4 text-right">ROI</th>
-                      <th className="pb-3 pr-4 text-right">Investments</th>
-                      <th className="pb-3 pr-4 text-right">Win Rate</th>
-                      <th className="pb-3 text-right">Top App</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-botanical-200">
-                    {MOCK_TOP_TRADERS.map((trader) => {
-                      const badge = getRankBadge(trader.rank);
-                      return (
-                        <tr key={trader.address} className="hover:bg-botanical-50">
-                          <td className="py-4 pr-4">
-                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}>
-                              {badge.label}
-                            </span>
-                          </td>
-                          <td className="py-4 pr-4">
-                            <span className="font-mono text-sm">
-                              {shortenAddress(trader.address)}
-                            </span>
-                          </td>
-                          <td className="py-4 pr-4 text-right">
-                            <span className="font-semibold text-green-600">
-                              +${trader.pnl.toLocaleString()}
-                            </span>
-                          </td>
-                          <td className="py-4 pr-4 text-right">
-                            <span className="text-green-600">
-                              +{trader.pnlPercent.toFixed(1)}%
-                            </span>
-                          </td>
-                          <td className="py-4 pr-4 text-right">
-                            {trader.tradesCount}
-                          </td>
-                          <td className="py-4 pr-4 text-right">
-                            <span className={trader.winRate >= 60 ? 'text-green-600' : ''}>
-                              {trader.winRate.toFixed(1)}%
-                            </span>
-                          </td>
-                          <td className="py-4 text-right">
-                            <span className="px-2 py-1 bg-botanical-100 rounded text-sm">
-                              {trader.topHolding}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile Cards */}
-              <div className="md:hidden space-y-3">
-                {MOCK_TOP_TRADERS.map((trader) => {
-                  const badge = getRankBadge(trader.rank);
-                  return (
-                    <div key={trader.address} className="p-4 bg-botanical-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}>
-                            {badge.label}
-                          </span>
-                          <span className="font-mono text-sm">
-                            {shortenAddress(trader.address)}
-                          </span>
-                        </div>
-                        <span className="px-2 py-1 bg-botanical-100 rounded text-xs">
-                          {trader.topHolding}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2 text-center">
-                        <div>
-                          <p className="font-semibold text-green-600 text-sm">+${(trader.pnl / 1000).toFixed(1)}K</p>
-                          <p className="text-xs text-muted">Returns</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-green-600 text-sm">+{trader.pnlPercent.toFixed(0)}%</p>
-                          <p className="text-xs text-muted">ROI</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm">{trader.tradesCount}</p>
-                          <p className="text-xs text-muted">Apps</p>
-                        </div>
-                        <div>
-                          <p className={`font-semibold text-sm ${trader.winRate >= 60 ? 'text-green-600' : ''}`}>{trader.winRate.toFixed(0)}%</p>
-                          <p className="text-xs text-muted">Win</p>
-                        </div>
-                      </div>
+                {/* Full Rankings */}
+                <div className="surface-panel">
+                  <h3 className="heading-3 mb-4">Full Rankings</h3>
+                  {topRankedTokens.length === 0 ? (
+                    <p className="text-muted text-center py-8">No apps yet</p>
+                  ) : (
+                    <div className="divide-y divide-botanical-200">
+                      {topRankedTokens.map((token, index) => (
+                        <TokenRow key={token.id} token={token} rank={index + 1} />
+                      ))}
                     </div>
-                  );
-                })}
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+
+            {/* Trending Tokens */}
+            {activeTab === 'trending' && (
+              <div className="space-y-6">
+                {/* Biggest Gainers */}
+                <div className="surface-panel">
+                  <h3 className="heading-3 mb-4">
+                    <span className="text-green-500 mr-2">📈</span>
+                    Biggest Gainers (24h)
+                  </h3>
+                  {trendingTokens.filter(t => t.priceChange24h > 0).length === 0 ? (
+                    <p className="text-muted text-center py-8">No gainers today</p>
+                  ) : (
+                    <div className="divide-y divide-botanical-200">
+                      {trendingTokens
+                        .filter(t => t.priceChange24h > 0)
+                        .map((token, index) => (
+                          <TokenRow key={token.id} token={token} rank={index + 1} showChange />
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Biggest Losers */}
+                <div className="surface-panel">
+                  <h3 className="heading-3 mb-4">
+                    <span className="text-red-500 mr-2">📉</span>
+                    Biggest Losers (24h)
+                  </h3>
+                  {trendingTokens.filter(t => t.priceChange24h < 0).length === 0 ? (
+                    <p className="text-muted text-center py-8">No losers today</p>
+                  ) : (
+                    <div className="divide-y divide-botanical-200">
+                      {[...trendingTokens]
+                        .reverse()
+                        .filter(t => t.priceChange24h < 0)
+                        .map((token, index) => (
+                          <TokenRow key={token.id} token={token} rank={index + 1} showChange />
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Top Investors */}
+            {activeTab === 'investors' && (
+              <div className="space-y-6">
+                {/* Top 3 Featured */}
+                {traders.length >= 3 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {traders.slice(0, 3).map((trader, index) => (
+                      <TraderPodium key={trader.address} trader={{ ...trader, rank: index + 1 }} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Full Rankings */}
+                <div className="surface-panel">
+                  <h3 className="heading-3 mb-4">All Investors</h3>
+                  {traders.length === 0 ? (
+                    <p className="text-muted text-center py-8">No traders yet</p>
+                  ) : (
+                    <>
+                      {/* Desktop Table */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="text-left text-sm text-muted border-b border-botanical-200">
+                              <th className="pb-3 pr-4">Rank</th>
+                              <th className="pb-3 pr-4">Investor</th>
+                              <th className="pb-3 pr-4 text-right">P&L</th>
+                              <th className="pb-3 pr-4 text-right">Portfolio</th>
+                              <th className="pb-3 pr-4 text-right">Trades</th>
+                              <th className="pb-3 text-right">Battle Wins</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-botanical-200">
+                            {traders.map((trader, index) => {
+                              const badge = getRankBadge(index + 1);
+                              return (
+                                <tr key={trader.address} className="hover:bg-botanical-50">
+                                  <td className="py-4 pr-4">
+                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}>
+                                      {badge.label}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 pr-4">
+                                    <div>
+                                      <span className="font-mono text-sm">
+                                        {trader.username || shortenAddress(trader.address)}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="py-4 pr-4 text-right">
+                                    <span className={`font-semibold ${trader.totalProfitLoss >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                      {trader.totalProfitLoss >= 0 ? '+' : ''}${trader.totalProfitLoss.toLocaleString()}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 pr-4 text-right">
+                                    ${trader.portfolioValue.toLocaleString()}
+                                  </td>
+                                  <td className="py-4 pr-4 text-right">
+                                    {trader.totalTrades}
+                                  </td>
+                                  <td className="py-4 text-right">
+                                    <span className="text-green-600 font-medium">{trader.battleWins}</span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Cards */}
+                      <div className="md:hidden space-y-3">
+                        {traders.map((trader, index) => {
+                          const badge = getRankBadge(index + 1);
+                          return (
+                            <div key={trader.address} className="p-4 bg-botanical-50 rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}>
+                                    {badge.label}
+                                  </span>
+                                  <span className="font-mono text-sm">
+                                    {trader.username || shortenAddress(trader.address)}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-4 gap-2 text-center">
+                                <div>
+                                  <p className={`font-semibold text-sm ${trader.totalProfitLoss >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                    {trader.totalProfitLoss >= 0 ? '+' : ''}${(trader.totalProfitLoss / 1000).toFixed(1)}K
+                                  </p>
+                                  <p className="text-xs text-muted">P&L</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm">${(trader.portfolioValue / 1000).toFixed(1)}K</p>
+                                  <p className="text-xs text-muted">Value</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm">{trader.totalTrades}</p>
+                                  <p className="text-xs text-muted">Trades</p>
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm text-green-600">{trader.battleWins}</p>
+                                  <p className="text-xs text-muted">Wins</p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Gamification Leaderboards */}
+            {activeTab === 'gamification' && (
+              <div className="space-y-8">
+                {/* Quick Overview - Top 3 from each category */}
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="surface-panel p-4 text-center">
+                    <span className="text-3xl mb-2 block">🃏</span>
+                    <h4 className="font-bold">Best Hands</h4>
+                    <p className="text-sm text-muted">Poker rankings</p>
+                  </div>
+                  <div className="surface-panel p-4 text-center">
+                    <span className="text-3xl mb-2 block">⭐</span>
+                    <h4 className="font-bold">XP Leaders</h4>
+                    <p className="text-sm text-muted">Experience points</p>
+                  </div>
+                  <div className="surface-panel p-4 text-center">
+                    <span className="text-3xl mb-2 block">💎</span>
+                    <h4 className="font-bold">Diamond Hands</h4>
+                    <p className="text-sm text-muted">Longest holders</p>
+                  </div>
+                  <div className="surface-panel p-4 text-center">
+                    <span className="text-3xl mb-2 block">📊</span>
+                    <h4 className="font-bold">Volume Kings</h4>
+                    <p className="text-sm text-muted">Trading volume</p>
+                  </div>
+                </div>
+
+                {/* Full Leaderboard Tabs */}
+                <LeaderboardTabs />
+
+                {/* Category Grids */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <LeaderboardDisplay type="hands" limit={5} />
+                  <LeaderboardDisplay type="xp" limit={5} />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <LeaderboardDisplay type="diamond-hands" limit={5} />
+                  <LeaderboardDisplay type="volume" limit={5} />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <LeaderboardDisplay type="portfolio" limit={5} />
+                  <LeaderboardDisplay type="collection" limit={5} />
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <LeaderboardDisplay type="battle" limit={5} />
+                  <LeaderboardDisplay type="performance" limit={5} />
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
@@ -257,26 +383,22 @@ function TokenPodium({ token, rank }: { token: Token; rank: number }) {
   return (
     <Link href={`/marketplace/${token.id}`}>
       <div className={`surface-panel text-center ${podiumHeight} hover:shadow-lg transition-shadow`}>
-        {/* Rank Badge */}
         <div className={`inline-block px-4 py-1.5 rounded-full text-lg font-bold mb-4 ${badge.bg} ${badge.text}`}>
           {rank === 1 ? '👑 1st' : rank === 2 ? '🥈 2nd' : '🥉 3rd'}
         </div>
 
-        {/* Card */}
         <div className="flex justify-center mb-4">
           <PlayingCard
-            rank={getRankFromScore(token.score) as any}
-            suit={getSuitForCategory(token.category)}
+            rank={getRankFromScore(token.score) as Rank}
+            suit={getSuitForCategory(token.category) as Suit}
             size="md"
             flippable={false}
           />
         </div>
 
-        {/* Token Info */}
         <h3 className="font-semibold text-lg">{token.name}</h3>
         <p className="text-muted text-sm mb-2">{token.symbol}</p>
 
-        {/* Performance */}
         <div className="flex items-center justify-center gap-4">
           <div>
             <p className="text-2xl font-bold">{token.score}</p>
@@ -302,35 +424,30 @@ function TokenRow({ token, rank, showChange = false }: { token: Token; rank: num
   return (
     <Link href={`/marketplace/${token.id}`}>
       <div className="py-4 flex items-center gap-2 sm:gap-4 hover:bg-botanical-50 transition-colors -mx-6 px-6">
-        {/* Rank */}
         <div className={`w-10 sm:w-12 text-center px-1.5 sm:px-2 py-1 rounded-full text-xs sm:text-sm font-medium ${badge.bg} ${badge.text}`}>
           {badge.label}
         </div>
 
-        {/* Mini Card - Hidden on very small screens */}
         <div className="flex-shrink-0 hidden xs:block">
           <PlayingCard
-            rank={getRankFromScore(token.score) as any}
-            suit={getSuitForCategory(token.category)}
+            rank={getRankFromScore(token.score) as Rank}
+            suit={getSuitForCategory(token.category) as Suit}
             size="sm"
             flippable={false}
           />
         </div>
 
-        {/* Token Info */}
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm sm:text-base truncate">{token.name}</p>
           <p className="text-muted text-xs sm:text-sm">{token.symbol}</p>
         </div>
 
-        {/* Category - Hidden on mobile */}
         <div className="hidden sm:block">
           <span className="px-2 py-1 bg-botanical-100 rounded text-sm">
             {token.category}
           </span>
         </div>
 
-        {/* Score or Change */}
         {showChange ? (
           <div className="text-right min-w-[60px] sm:min-w-[80px]">
             <p className={`text-sm sm:text-lg font-bold ${token.priceChange24h >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -345,7 +462,6 @@ function TokenRow({ token, rank, showChange = false }: { token: Token; rank: num
           </div>
         )}
 
-        {/* Price - Condensed on mobile */}
         <div className="text-right min-w-[60px] sm:min-w-[80px]">
           <p className="font-semibold text-sm sm:text-base">${token.price.toFixed(2)}</p>
           <p className={`text-xs ${token.priceChange24h >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -364,37 +480,35 @@ function TraderPodium({ trader }: { trader: Trader }) {
 
   return (
     <div className={`surface-panel text-center ${podiumHeight}`}>
-      {/* Rank Badge */}
       <div className={`inline-block px-4 py-1.5 rounded-full text-lg font-bold mb-4 ${badge.bg} ${badge.text}`}>
         {trader.rank === 1 ? '👑 1st' : trader.rank === 2 ? '🥈 2nd' : '🥉 3rd'}
       </div>
 
-      {/* Avatar */}
       <div className="w-16 h-16 bg-gradient-to-br from-botanical-400 to-botanical-600 rounded-full flex items-center justify-center mx-auto mb-4">
         <span className="text-xl text-white font-bold">
           {trader.address.slice(2, 4).toUpperCase()}
         </span>
       </div>
 
-      {/* Address */}
       <p className="font-mono text-sm text-muted mb-2">
-        {shortenAddress(trader.address)}
+        {trader.username || shortenAddress(trader.address)}
       </p>
 
-      {/* Stats */}
       <div className="space-y-2">
         <div>
-          <p className="text-2xl font-bold text-green-600">+${trader.pnl.toLocaleString()}</p>
-          <p className="text-xs text-muted">Total Returns</p>
+          <p className={`text-2xl font-bold ${trader.totalProfitLoss >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            {trader.totalProfitLoss >= 0 ? '+' : ''}${trader.totalProfitLoss.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted">Total P&L</p>
         </div>
         <div className="flex justify-center gap-4 text-sm">
           <div>
-            <p className="font-semibold">{trader.tradesCount}</p>
-            <p className="text-xs text-muted">Apps</p>
+            <p className="font-semibold">{trader.totalTrades}</p>
+            <p className="text-xs text-muted">Trades</p>
           </div>
           <div>
-            <p className="font-semibold text-green-600">{trader.winRate.toFixed(0)}%</p>
-            <p className="text-xs text-muted">Win Rate</p>
+            <p className="font-semibold text-green-600">{trader.battleWins}</p>
+            <p className="text-xs text-muted">Wins</p>
           </div>
         </div>
       </div>

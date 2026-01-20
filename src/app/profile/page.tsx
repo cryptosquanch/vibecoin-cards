@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePrivy } from '@privy-io/react-auth';
 import { Header } from '@/components/layout';
@@ -8,29 +8,27 @@ import { PlayingCard, getSuitForCategory, getRankFromScore } from '@/components/
 import { TradeModal } from '@/components/trading';
 import { WatchlistButton } from '@/components/watchlist';
 import { HandDisplay, HandGuide } from '@/components/hands';
-import { EvolvedCard, EvolutionStats, EvolutionBadgeIcon } from '@/components/evolution';
+import { EvolvedCard, EvolutionBadgeIcon } from '@/components/evolution';
 import { CollectionDashboard, CollectionScoreBadge } from '@/components/collections';
-import { QuickBattleWidget, BattleStatsCard, LeaderboardDisplay } from '@/components/social';
-import { useWatchlistStore } from '@/store';
-import { MOCK_EVOLUTION_DATA, type CardEvolutionState } from '@/lib/evolution';
-import { MOCK_BATTLE_STATS, getBattleRank } from '@/lib/battles';
+import { BattleStatsCard, LeaderboardDisplay } from '@/components/social';
+import { QuestsPanel } from '@/components/quests';
+import { StakingPanel } from '@/components/staking';
+import { LevelBadge, LevelProgressCard } from '@/components/leveling';
+import { useWatchlistStore, useLevelingStore, useStakingStore } from '@/store';
+import { useUserData } from '@/hooks';
+import { MOCK_EVOLUTION_DATA } from '@/lib/evolution';
+import { getBattleRank } from '@/lib/battles';
 import {
   MOCK_COLLECTION_DATA,
   calculateCollectionStats,
   type CardBackType,
 } from '@/lib/collections';
 import {
-  MOCK_HOLDINGS,
-  MOCK_TRANSACTIONS,
-  MOCK_USER_ACHIEVEMENTS,
   MOCK_TOKENS,
   type Token,
-  type Holding,
-  type Transaction,
-  type UserAchievement,
 } from '@/lib/mock-data';
 
-type Tab = 'holdings' | 'collection' | 'social' | 'watchlist' | 'history' | 'achievements';
+type Tab = 'holdings' | 'collection' | 'social' | 'quests' | 'staking' | 'watchlist' | 'history' | 'achievements';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -67,43 +65,101 @@ const RARITY_COLORS = {
 export default function ProfilePage() {
   const { authenticated, user, login } = usePrivy();
   const [activeTab, setActiveTab] = useState<Tab>('holdings');
-  const [holdings, setHoldings] = useState<(Holding & { token: Token })[]>([]);
-  const [transactions, setTransactions] = useState<(Transaction & { token: Token })[]>([]);
-  const [achievements, setAchievements] = useState<UserAchievement[]>([]);
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
   const [selectedCardBack, setSelectedCardBack] = useState<CardBackType>(
     MOCK_COLLECTION_DATA.selectedCardBack
   );
   const { watchlist } = useWatchlistStore();
+  const { level, totalXP } = useLevelingStore();
+  const { stakedAmount, getCurrentTier, getXPMultiplier } = useStakingStore();
+  const currentStakingTier = getCurrentTier();
+  const xpMultiplier = getXPMultiplier();
+
+  // Fetch real user data
+  const {
+    holdings: userHoldings,
+    trades,
+    achievements: achievementProgress,
+    stats,
+    loading: userLoading,
+  } = useUserData();
 
   // Get watched tokens
   const watchedTokens = useMemo(() => {
     return MOCK_TOKENS.filter(token => watchlist.includes(token.id));
   }, [watchlist]);
 
-  useEffect(() => {
-    // Merge holdings with token data
-    const holdingsWithTokens = MOCK_HOLDINGS.map(holding => {
-      const token = MOCK_TOKENS.find(t => t.id === holding.tokenId)!;
-      return { ...holding, token };
-    });
-    setHoldings(holdingsWithTokens);
+  // Transform holdings to expected format
+  const holdings = useMemo(() => {
+    return userHoldings.map(h => ({
+      tokenId: h.tokenId,
+      amount: h.amount,
+      avgBuyPrice: h.averageCost,
+      currentValue: h.amount * h.token.price,
+      pnl: h.amount * (h.token.price - h.averageCost),
+      pnlPercent: h.averageCost > 0 ? ((h.token.price - h.averageCost) / h.averageCost) * 100 : 0,
+      token: {
+        ...h.token,
+        category: h.token.category as 'AI' | 'DeFi' | 'Gaming' | 'Creator',
+        description: '',
+        logo: h.token.logo || null,
+        volume24h: 0,
+        holders: 0,
+        marketCap: 0,
+        creator: '',
+      },
+    }));
+  }, [userHoldings]);
 
-    // Merge transactions with token data
-    const transactionsWithTokens = MOCK_TRANSACTIONS.map(tx => {
-      const token = MOCK_TOKENS.find(t => t.id === tx.tokenId)!;
-      return { ...tx, token };
-    });
-    setTransactions(transactionsWithTokens);
+  // Transform trades to expected format
+  const transactions = useMemo(() => {
+    return trades.map(t => ({
+      id: t.id,
+      tokenId: t.tokenId,
+      type: t.type.toLowerCase() as 'buy' | 'sell',
+      amount: t.amount,
+      price: t.price,
+      total: t.total,
+      fee: t.total * 0.01, // Estimate fee
+      txHash: t.txHash || '0x0000000000000000000000000000000000000000000000000000000000000000',
+      timestamp: t.createdAt,
+      token: {
+        name: t.token.name,
+        symbol: t.token.symbol,
+        category: t.token.category as 'AI' | 'DeFi' | 'Gaming' | 'Creator',
+        id: t.tokenId,
+        description: '',
+        logo: null,
+        score: 50,
+        price: t.price,
+        priceChange24h: 0,
+        volume24h: 0,
+        holders: 0,
+        marketCap: 0,
+        createdAt: t.createdAt,
+        creator: '',
+      },
+    }));
+  }, [trades]);
 
-    // Set achievements
-    setAchievements(MOCK_USER_ACHIEVEMENTS);
-  }, []);
+  // Transform achievements
+  const achievements = useMemo(() => {
+    return achievementProgress.map(a => ({
+      id: a.achievementId,
+      name: a.achievementName,
+      description: a.requirement?.type || 'Complete to unlock',
+      icon: '🏆',
+      rarity: 'common' as const,
+      unlockedAt: a.unlocked ? a.unlockedAt : null,
+      progress: typeof a.currentValue === 'number' ? a.currentValue : 0,
+      maxProgress: typeof a.targetValue === 'number' ? a.targetValue : 0,
+    }));
+  }, [achievementProgress]);
 
-  const totalValue = holdings.reduce((sum, h) => sum + h.currentValue, 0);
-  const totalPnl = holdings.reduce((sum, h) => sum + h.pnl, 0);
-  const totalPnlPercent = totalValue > 0 ? (totalPnl / (totalValue - totalPnl)) * 100 : 0;
+  const totalValue = stats.totalValue;
+  const totalPnl = stats.totalPnl;
+  const totalPnlPercent = stats.totalPnlPercent;
 
   // Get user's tokens for hand calculation
   const userTokens = useMemo(() => holdings.map(h => h.token), [holdings]);
@@ -155,6 +211,14 @@ export default function ProfilePage() {
       <Header />
 
       <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* Loading State */}
+        {userLoading && (
+          <div className="surface-panel text-center py-12 mb-8">
+            <div className="animate-spin w-8 h-8 border-4 border-botanical-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-muted">Loading your portfolio...</p>
+          </div>
+        )}
+
         {/* Profile Header */}
         <div className="surface-panel mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -165,11 +229,19 @@ export default function ProfilePage() {
                   {walletAddress.slice(2, 4).toUpperCase()}
                 </span>
               </div>
-              <div>
-                <h1 className="text-xl md:text-2xl font-semibold">My Portfolio</h1>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-xl md:text-2xl font-semibold">My Portfolio</h1>
+                  <LevelBadge size="sm" showProgress={false} showXP={false} />
+                </div>
                 <p className="text-muted font-mono text-sm">
                   {shortenAddress(walletAddress)}
                 </p>
+                {xpMultiplier > 1 && (
+                  <p className="text-xs text-purple-600 mt-1">
+                    ✨ {xpMultiplier}x XP Multiplier from Staking
+                  </p>
+                )}
               </div>
             </div>
 
@@ -231,10 +303,12 @@ export default function ProfilePage() {
           {([
             { id: 'holdings' as Tab, label: 'My Apps' },
             { id: 'collection' as Tab, label: '🃏 Collection' },
+            { id: 'quests' as Tab, label: '📋 Quests' },
+            { id: 'staking' as Tab, label: '💎 Staking' },
             { id: 'social' as Tab, label: '⚔️ Social' },
-            { id: 'watchlist' as Tab, label: `Watchlist (${watchedTokens.length})` },
+            { id: 'watchlist' as Tab, label: `⭐ Watchlist (${watchedTokens.length})` },
             { id: 'history' as Tab, label: 'History' },
-            { id: 'achievements' as Tab, label: 'Achievements' },
+            { id: 'achievements' as Tab, label: '🏆 Achievements' },
           ]).map((tab) => (
             <button
               key={tab.id}
@@ -385,11 +459,41 @@ export default function ProfilePage() {
           />
         )}
 
+        {/* Quests Tab */}
+        {activeTab === 'quests' && (
+          <div className="space-y-6">
+            {/* Level Progress Card */}
+            <LevelProgressCard />
+
+            {/* Quests Panel */}
+            <QuestsPanel />
+          </div>
+        )}
+
+        {/* Staking Tab */}
+        {activeTab === 'staking' && (
+          <StakingPanel vibeBalance={10000} />
+        )}
+
         {/* Social Tab */}
         {activeTab === 'social' && (
           <div className="space-y-6">
             {/* Battle Stats */}
-            <BattleStatsCard stats={MOCK_BATTLE_STATS} />
+            <BattleStatsCard stats={{
+              totalBattles: stats.battleWins + stats.battleLosses,
+              wins: stats.battleWins,
+              losses: stats.battleLosses,
+              draws: 0,
+              winRate: stats.battleWins + stats.battleLosses > 0
+                ? (stats.battleWins / (stats.battleWins + stats.battleLosses)) * 100
+                : 0,
+              winStreak: 0,
+              bestWinStreak: 0,
+              totalWagersWon: 0,
+              totalWagersLost: 0,
+              rank: getBattleRank(1000 + (stats.battleWins - stats.battleLosses) * 10).rank,
+              elo: 1000 + (stats.battleWins - stats.battleLosses) * 10,
+            }} />
 
             {/* Quick Actions */}
             <div className="grid md:grid-cols-2 gap-4">

@@ -22,11 +22,17 @@ import {
   type PortfolioLeaderboardEntry,
   type CollectionLeaderboardEntry,
   type PerformanceLeaderboardEntry,
+  type XPLeaderboardEntry,
+  type VolumeLeaderboardEntry,
+  type DiamondHandsLeaderboardEntry,
   LEADERBOARD_CONFIGS,
   MOCK_HAND_LEADERBOARD,
   MOCK_PORTFOLIO_LEADERBOARD,
   MOCK_COLLECTION_LEADERBOARD,
   MOCK_PERFORMANCE_LEADERBOARD,
+  MOCK_XP_LEADERBOARD,
+  MOCK_VOLUME_LEADERBOARD,
+  MOCK_DIAMOND_HANDS_LEADERBOARD,
   getRankChange,
   formatRank,
   getMedal,
@@ -356,6 +362,12 @@ export function LeaderboardDisplay({ type, period = 'all-time', limit = 10 }: Le
         }));
       case 'performance':
         return MOCK_PERFORMANCE_LEADERBOARD.slice(0, limit);
+      case 'xp':
+        return MOCK_XP_LEADERBOARD.slice(0, limit);
+      case 'volume':
+        return MOCK_VOLUME_LEADERBOARD.slice(0, limit);
+      case 'diamond-hands':
+        return MOCK_DIAMOND_HANDS_LEADERBOARD.slice(0, limit);
       default:
         return [];
     }
@@ -430,6 +442,22 @@ export function LeaderboardDisplay({ type, period = 'all-time', limit = 10 }: Le
                 {type === 'performance' && (
                   <p className="text-xs text-muted">
                     {(entry as PerformanceLeaderboardEntry).tokenSymbol} • {(entry as PerformanceLeaderboardEntry).holdDays}d
+                  </p>
+                )}
+                {type === 'xp' && (
+                  <p className="text-xs text-muted">
+                    Lv.{(entry as XPLeaderboardEntry).level} {(entry as XPLeaderboardEntry).tier}
+                    {(entry as XPLeaderboardEntry).prestige > 0 && ` ★${(entry as XPLeaderboardEntry).prestige}`}
+                  </p>
+                )}
+                {type === 'volume' && (
+                  <p className="text-xs text-muted">
+                    {(entry as VolumeLeaderboardEntry).tradeCount.toLocaleString()} trades
+                  </p>
+                )}
+                {type === 'diamond-hands' && (
+                  <p className="text-xs text-muted">
+                    {(entry as DiamondHandsLeaderboardEntry).tokenSymbol} since {new Date((entry as DiamondHandsLeaderboardEntry).holdingSince).toLocaleDateString()}
                   </p>
                 )}
               </div>

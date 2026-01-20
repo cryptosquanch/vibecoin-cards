@@ -13,7 +13,7 @@ import type { HandType } from './hands';
 import type { CollectionRank } from './collections';
 import type { BattleRank } from './battles';
 
-export type LeaderboardType = 'hands' | 'portfolio' | 'collection' | 'battle' | 'performance';
+export type LeaderboardType = 'hands' | 'portfolio' | 'collection' | 'battle' | 'performance' | 'xp' | 'volume' | 'diamond-hands';
 export type LeaderboardPeriod = 'all-time' | 'monthly' | 'weekly' | 'daily';
 
 export interface LeaderboardEntry {
@@ -69,6 +69,34 @@ export interface PerformanceLeaderboardEntry extends LeaderboardEntry {
   entryPrice: number;
   currentPrice: number;
   holdDays: number;
+}
+
+// XP Leaderboard
+export interface XPLeaderboardEntry extends LeaderboardEntry {
+  totalXP: number;
+  level: number;
+  tier: string;
+  prestige: number;
+  weeklyXP: number;
+}
+
+// Volume Leaderboard
+export interface VolumeLeaderboardEntry extends LeaderboardEntry {
+  totalVolume: number;
+  volume24h: number;
+  volume7d: number;
+  volume30d: number;
+  tradeCount: number;
+}
+
+// Diamond Hands Leaderboard
+export interface DiamondHandsLeaderboardEntry extends LeaderboardEntry {
+  longestHold: number; // days
+  tokenName: string;
+  tokenSymbol: string;
+  holdingSince: string;
+  currentValue: number;
+  unrealizedPnl: number;
 }
 
 /**
@@ -458,6 +486,237 @@ export const MOCK_PERFORMANCE_LEADERBOARD: PerformanceLeaderboardEntry[] = [
   },
 ];
 
+export const MOCK_XP_LEADERBOARD: XPLeaderboardEntry[] = [
+  {
+    rank: 1,
+    previousRank: 1,
+    address: '0xXP01...',
+    username: 'XPGrinder',
+    value: 125000,
+    totalXP: 125000,
+    level: 50,
+    tier: 'Legend',
+    prestige: 2,
+    weeklyXP: 8500,
+  },
+  {
+    rank: 2,
+    previousRank: 2,
+    address: '0xXP02...',
+    username: 'QuestMaster',
+    value: 98500,
+    totalXP: 98500,
+    level: 48,
+    tier: 'Legend',
+    prestige: 1,
+    weeklyXP: 6200,
+  },
+  {
+    rank: 3,
+    previousRank: 4,
+    address: '0xXP03...',
+    username: 'DailyDevotee',
+    value: 75000,
+    totalXP: 75000,
+    level: 42,
+    tier: 'Master',
+    prestige: 1,
+    weeklyXP: 7800,
+  },
+  {
+    rank: 4,
+    previousRank: 3,
+    address: '0xXP04...',
+    username: 'StreakKing',
+    value: 62000,
+    totalXP: 62000,
+    level: 38,
+    tier: 'Master',
+    prestige: 0,
+    weeklyXP: 4500,
+  },
+  {
+    rank: 5,
+    previousRank: 5,
+    address: '0xXP05...',
+    username: 'AchievementHunter',
+    value: 48500,
+    totalXP: 48500,
+    level: 32,
+    tier: 'Expert',
+    prestige: 0,
+    weeklyXP: 3200,
+  },
+  {
+    rank: 89,
+    address: '0x1234...5678',
+    username: 'You',
+    value: 2450,
+    totalXP: 2450,
+    level: 8,
+    tier: 'Apprentice',
+    prestige: 0,
+    weeklyXP: 850,
+    isCurrentUser: true,
+  },
+];
+
+export const MOCK_VOLUME_LEADERBOARD: VolumeLeaderboardEntry[] = [
+  {
+    rank: 1,
+    previousRank: 1,
+    address: '0xVOL1...',
+    username: 'MegaTrader',
+    value: 15800000,
+    totalVolume: 15800000,
+    volume24h: 450000,
+    volume7d: 2100000,
+    volume30d: 8500000,
+    tradeCount: 2847,
+  },
+  {
+    rank: 2,
+    previousRank: 3,
+    address: '0xVOL2...',
+    username: 'VolumeKing',
+    value: 12500000,
+    totalVolume: 12500000,
+    volume24h: 380000,
+    volume7d: 1800000,
+    volume30d: 6200000,
+    tradeCount: 1956,
+  },
+  {
+    rank: 3,
+    previousRank: 2,
+    address: '0xVOL3...',
+    username: 'FlipMaster',
+    value: 9200000,
+    totalVolume: 9200000,
+    volume24h: 520000,
+    volume7d: 2400000,
+    volume30d: 5100000,
+    tradeCount: 3421,
+  },
+  {
+    rank: 4,
+    previousRank: 4,
+    address: '0xVOL4...',
+    username: 'SwingTrader',
+    value: 7800000,
+    totalVolume: 7800000,
+    volume24h: 180000,
+    volume7d: 950000,
+    volume30d: 3800000,
+    tradeCount: 892,
+  },
+  {
+    rank: 5,
+    previousRank: 6,
+    address: '0xVOL5...',
+    username: 'DayTraderPro',
+    value: 6100000,
+    totalVolume: 6100000,
+    volume24h: 620000,
+    volume7d: 1950000,
+    volume30d: 2800000,
+    tradeCount: 4215,
+  },
+  {
+    rank: 234,
+    address: '0x1234...5678',
+    username: 'You',
+    value: 45600,
+    totalVolume: 45600,
+    volume24h: 2500,
+    volume7d: 12000,
+    volume30d: 28000,
+    tradeCount: 47,
+    isCurrentUser: true,
+  },
+];
+
+export const MOCK_DIAMOND_HANDS_LEADERBOARD: DiamondHandsLeaderboardEntry[] = [
+  {
+    rank: 1,
+    previousRank: 1,
+    address: '0xDH01...',
+    username: 'TrueBeliever',
+    value: 365,
+    longestHold: 365,
+    tokenName: 'Neural Nexus',
+    tokenSymbol: 'NEURAL',
+    holdingSince: '2024-01-15',
+    currentValue: 125000,
+    unrealizedPnl: 118750,
+  },
+  {
+    rank: 2,
+    previousRank: 2,
+    address: '0xDH02...',
+    username: 'PatientPete',
+    value: 312,
+    longestHold: 312,
+    tokenName: 'DeFi Dragon',
+    tokenSymbol: 'DRAGON',
+    holdingSince: '2024-03-10',
+    currentValue: 89000,
+    unrealizedPnl: 76500,
+  },
+  {
+    rank: 3,
+    previousRank: 3,
+    address: '0xDH03...',
+    username: 'LongTermLisa',
+    value: 285,
+    longestHold: 285,
+    tokenName: 'Pixel Punks',
+    tokenSymbol: 'PIXEL',
+    holdingSince: '2024-04-05',
+    currentValue: 67500,
+    unrealizedPnl: 52000,
+  },
+  {
+    rank: 4,
+    previousRank: 5,
+    address: '0xDH04...',
+    username: 'SteadyEddie',
+    value: 248,
+    longestHold: 248,
+    tokenName: 'AI Agent',
+    tokenSymbol: 'AGENT',
+    holdingSince: '2024-05-15',
+    currentValue: 45000,
+    unrealizedPnl: 38200,
+  },
+  {
+    rank: 5,
+    previousRank: 4,
+    address: '0xDH05...',
+    username: 'HodlHero',
+    value: 225,
+    longestHold: 225,
+    tokenName: 'Meta Memes',
+    tokenSymbol: 'MEME',
+    holdingSince: '2024-06-08',
+    currentValue: 32000,
+    unrealizedPnl: 24500,
+  },
+  {
+    rank: 78,
+    address: '0x1234...5678',
+    username: 'You',
+    value: 45,
+    longestHold: 45,
+    tokenName: 'DeFi Dragon',
+    tokenSymbol: 'DRAGON',
+    holdingSince: '2024-12-05',
+    currentValue: 8500,
+    unrealizedPnl: 2340,
+    isCurrentUser: true,
+  },
+];
+
 // Combined leaderboard config
 export interface LeaderboardConfig {
   type: LeaderboardType;
@@ -508,5 +767,29 @@ export const LEADERBOARD_CONFIGS: Record<LeaderboardType, LeaderboardConfig> = {
     description: 'Highest token multiples',
     valueLabel: 'Multiple',
     valueFormat: (v) => `${v}x`,
+  },
+  xp: {
+    type: 'xp',
+    title: 'XP Leaders',
+    icon: '⭐',
+    description: 'Most experienced players',
+    valueLabel: 'Total XP',
+    valueFormat: (v) => v.toLocaleString(),
+  },
+  volume: {
+    type: 'volume',
+    title: 'Trading Volume',
+    icon: '📊',
+    description: 'Highest all-time trading volume',
+    valueLabel: 'Volume',
+    valueFormat: (v) => `$${(v / 1000000).toFixed(1)}M`,
+  },
+  'diamond-hands': {
+    type: 'diamond-hands',
+    title: 'Diamond Hands',
+    icon: '💎',
+    description: 'Longest token hold durations',
+    valueLabel: 'Days Held',
+    valueFormat: (v) => `${v}d`,
   },
 };
