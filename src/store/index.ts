@@ -5,3 +5,4 @@ export { useQuestsStore } from './quests';
 export { useLevelingStore } from './leveling';
 export { useStakingStore } from './staking';
 export { useBattlesStore } from './battles';
+export { useReviewsStore } from './reviews';

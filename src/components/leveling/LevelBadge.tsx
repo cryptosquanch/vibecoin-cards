@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLevelingStore } from '@/store';
 import {
   type UserLevel,
@@ -15,6 +15,19 @@ import {
   getLevelInfo,
   getUnlocksUpToLevel,
 } from '@/lib/leveling';
+
+/**
+ * ★ Insight ─────────────────────────────────────
+ *
+ * LevelBadge uses tier-based visual styling:
+ * - Bronze/Silver/Gold/Legend have distinct colors
+ * - Progress ring SVG shows % to next level
+ * - Prestige badge indicates multiple 50+ completions
+ * - Pulse animation highlights level-up milestones
+ *
+ * Enhanced with Framer Motion for smooth transitions.
+ * ─────────────────────────────────────────────────
+ */
 
 interface LevelBadgeProps {
   size?: 'sm' | 'md' | 'lg';
@@ -43,13 +56,37 @@ export function LevelBadge({
 
   const config = sizeConfig[size];
 
+  // Tier-based glow for special effects
+  const tierGlow = level.tier === 'Grandmaster' || level.tier === 'Legend' ? 'shadow-yellow-300/50' :
+                   level.tier === 'Master' || level.tier === 'Expert' ? 'shadow-purple-200/40' :
+                   level.tier === 'Journeyman' ? 'shadow-blue-200/40' : '';
+
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <motion.div
+      className={`flex items-center gap-3 ${className}`}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Level Badge */}
-      <div className="relative">
-        <div className={`${config.badge} ${getTierBgColor(level.tier)} rounded-full flex items-center justify-center font-bold shadow-md`}>
+      <motion.div
+        className="relative"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <motion.div
+          className={`${config.badge} ${getTierBgColor(level.tier)} rounded-full flex items-center justify-center font-bold shadow-lg ${tierGlow}`}
+          animate={(level.tier === 'Legend' || level.tier === 'Grandmaster') ? {
+            boxShadow: [
+              '0 0 15px rgba(234, 179, 8, 0.3)',
+              '0 0 25px rgba(234, 179, 8, 0.5)',
+              '0 0 15px rgba(234, 179, 8, 0.3)',
+            ],
+          } : {}}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
           {level.level}
-        </div>
+        </motion.div>
 
         {/* Prestige indicator */}
         {prestigeBadge && (
@@ -76,30 +113,42 @@ export function LevelBadge({
             />
           </svg>
         )}
-      </div>
+      </motion.div>
 
       {/* Text info */}
-      {(showProgress || showXP) && (
-        <div>
-          <div className="flex items-center gap-2">
-            <span className={`font-semibold ${config.text} ${getTierColor(level.tier)}`}>
-              {getTierIcon(level.tier)} {level.tier}
-            </span>
-            {prestigeBadge && (
-              <span className={`${config.text} ${prestigeBadge.color}`}>
-                {prestigeBadge.label}
+      <AnimatePresence mode="wait">
+        {(showProgress || showXP) && (
+          <motion.div
+            key={level.level}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center gap-2">
+              <span className={`font-semibold ${config.text} ${getTierColor(level.tier)}`}>
+                {getTierIcon(level.tier)} {level.tier}
               </span>
+              {prestigeBadge && (
+                <motion.span
+                  className={`${config.text} ${prestigeBadge.color}`}
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {prestigeBadge.label}
+                </motion.span>
+              )}
+            </div>
+            {showXP && (
+              <p className={`text-muted ${config.text}`}>
+                {formatXP(totalXP)} XP
+                {level.level < 50 && ` · ${formatXP(xpToNext)} to next`}
+              </p>
             )}
-          </div>
-          {showXP && (
-            <p className={`text-muted ${config.text}`}>
-              {formatXP(totalXP)} XP
-              {level.level < 50 && ` · ${formatXP(xpToNext)} to next`}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

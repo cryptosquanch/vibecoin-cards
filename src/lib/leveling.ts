@@ -241,6 +241,11 @@ export const XP_REWARDS = {
   // Collections
   complete_collection_set: 150,
   unlock_card_back: 75,
+
+  // Reviews
+  review_submitted: 50,
+  review_helpful_received: 5,
+  review_vote: 2,
 } as const;
 
 export type XPSource = keyof typeof XP_REWARDS;
